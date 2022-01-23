@@ -1,8 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
-import '../firebase_options.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -31,71 +28,48 @@ class _RegisterView extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Register',
-          style: TextStyle(fontSize: 28),
+    return Column(
+      children: [
+        TextField(
+          controller: _email,
+          enableSuggestions: true,
+          autocorrect: false,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(hintText: 'Enter your email'),
         ),
-        centerTitle: true,
-      ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
+        TextField(
+          obscureText: true,
+          enableSuggestions: false,
+          autocorrect: false,
+          controller: _password,
+          decoration: const InputDecoration(hintText: 'Enter your password'),
         ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return Column(
-                children: [
-                  TextField(
-                    controller: _email,
-                    enableSuggestions: true,
-                    autocorrect: false,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration:
-                        const InputDecoration(hintText: 'Enter your email'),
-                  ),
-                  TextField(
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    controller: _password,
-                    decoration:
-                        const InputDecoration(hintText: 'Enter your password'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final email = _email.text;
-                      final password = _password.text;
-                      try {
-                        final userCredential = await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                                email: email, password: password);
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'weak password') {
-                          print('The password provided is too weak.');
-                        } else if (e.code == 'email-already-in-use') {
-                          print('An account already exists for this email.');
-                        } else if (e.code == 'invalid-email') {
-                          print('Use a valid email');
-                        }
-                      } catch (e) {
-                        print(e);
-                      }
-                    },
-                    child: const Text(
-                      'Register',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ],
-              );
-            default:
-              return const Text("Loading...");
-          }
-        },
-      ),
+        ElevatedButton(
+          onPressed: () async {
+            final email = _email.text;
+            final password = _password.text;
+            try {
+              final userCredential = await FirebaseAuth.instance
+                  .createUserWithEmailAndPassword(
+                      email: email, password: password);
+            } on FirebaseAuthException catch (e) {
+              if (e.code == 'weak password') {
+                print('The password provided is too weak.');
+              } else if (e.code == 'email-already-in-use') {
+                print('An account already exists for this email.');
+              } else if (e.code == 'invalid-email') {
+                print('Use a valid email');
+              }
+            } catch (e) {
+              print(e);
+            }
+          },
+          child: const Text(
+            'Register',
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+      ],
     );
   }
 }
