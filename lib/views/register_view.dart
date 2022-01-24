@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lemon_one/views/login_view.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -28,48 +29,64 @@ class _RegisterView extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _email,
-          enableSuggestions: true,
-          autocorrect: false,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(hintText: 'Enter your email'),
-        ),
-        TextField(
-          obscureText: true,
-          enableSuggestions: false,
-          autocorrect: false,
-          controller: _password,
-          decoration: const InputDecoration(hintText: 'Enter your password'),
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            final email = _email.text;
-            final password = _password.text;
-            try {
-              final userCredential = await FirebaseAuth.instance
-                  .createUserWithEmailAndPassword(
-                      email: email, password: password);
-            } on FirebaseAuthException catch (e) {
-              if (e.code == 'weak password') {
-                print('The password provided is too weak.');
-              } else if (e.code == 'email-already-in-use') {
-                print('An account already exists for this email.');
-              } else if (e.code == 'invalid-email') {
-                print('Use a valid email');
-              }
-            } catch (e) {
-              print(e);
-            }
-          },
-          child: const Text(
-            'Register',
-            style: TextStyle(fontSize: 20),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
+      ),
+      body: Column(
+        children: [
+          TextField(
+            controller: _email,
+            enableSuggestions: true,
+            autocorrect: false,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(hintText: 'Enter your email'),
           ),
-        ),
-      ],
+          TextField(
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            controller: _password,
+            decoration: const InputDecoration(hintText: 'Enter your password'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final email = _email.text;
+              final password = _password.text;
+              try {
+                final userCredential = await FirebaseAuth.instance
+                    .createUserWithEmailAndPassword(
+                        email: email, password: password);
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'weak password') {
+                  print('The password provided is too weak.');
+                } else if (e.code == 'email-already-in-use') {
+                  print('An account already exists for this email.');
+                } else if (e.code == 'invalid-email') {
+                  print('Use a valid email');
+                }
+              } catch (e) {
+                print(e);
+              }
+            },
+            child: const Text(
+              'Register',
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil("/login/", (route) => false);
+            },
+            child: const Text(
+              'Already registered? Login here',
+              style: TextStyle(fontSize: 15),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
