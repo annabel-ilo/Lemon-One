@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lemon_one/constants/route.dart';
+import 'package:lemon_one/services/auth/auth_exceptions.dart';
+import 'package:lemon_one/services/auth/auth_service.dart';
 import 'package:lemon_one/utils/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -59,45 +60,36 @@ class _LoginView extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await AuthService.firebase().login(
                   email: email,
                   password: password,
                 );
-                final user = FirebaseAuth.instance.currentUser;
-                if (user?.emailVerified ?? false){
-
+                final user = AuthService.firebase().currentUser;
+                if (user?.isEmailVerified ?? false) {
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                  notesRoute,
-                  (route) => false,
-                );
-                }else{
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                  verifyEmailRoute,
-                  (route) => false,
-                );
-                }
-                
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'user-not-found') {
-                  await showErrorDialog(
-                    context,
-                    'User Not Found',
-                  );
-                } else if (e.code == 'wrong-password') {
-                  await showErrorDialog(
-                    context,
-                    'Wrong Credential',
+                    notesRoute,
+                    (route) => false,
                   );
                 } else {
-                  await showErrorDialog(
-                    context,
-                    'Error: ${e.code}',
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmailRoute,
+                    (route) => false,
                   );
                 }
-              } catch (e) {
+              } on UserNotFoundAuthException {
                 await showErrorDialog(
                   context,
-                  e.toString(),
+                  'User Not Found',
+                );
+              } on WrongPasswordAuthException {
+                await showErrorDialog(
+                  context,
+                  'Wrong Credential',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context,
+                  'Authentication Error',
                 );
               }
             },
