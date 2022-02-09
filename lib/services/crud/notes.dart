@@ -296,7 +296,7 @@ const noteTable = 'note';
 const userTable = 'user';
 const idColumn = "id";
 const emailColumn = 'email';
-const userIdColumn = 'userId';
+const userIdColumn = 'user_Id';
 const textColumn = 'text';
 
 const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
